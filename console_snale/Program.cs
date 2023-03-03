@@ -9,8 +9,8 @@ public class StartLogic{
     
     public void GameBegin()
     {
-        ReadGameFile readGameFile = new ReadGameFile();
-        Game game = new Game();
+        ReadGameFile readGameFile = new();
+        Game game = new();
         var gameInfo = readGameFile.ReadSettingFile();
         var score = game.Start();
         if (score > gameInfo.HighScore) gameInfo.HighScore = score;

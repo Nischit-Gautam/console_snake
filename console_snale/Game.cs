@@ -10,7 +10,7 @@ namespace console_snale
     {
         public static int width = 80;
         public static int height = 20;
-        public static SnakeLorry snakeLorry = new SnakeLorry();
+        public static SnakeLorry snakeLorry = new();
         public static int initialSnakeLength = 3;
         public static int xDirection = 1;//moving left to right-- 0 = not moving in x direction, 1 = left to right, -1= right to left
         public static int yDirection = 0;//moving down to up-- 0 = not moving in y direction, 1 = up to down, -1= down to up  
@@ -20,11 +20,11 @@ namespace console_snale
         public static int HiScore = 0;
         public static bool gameOver=false;
         public static bool gamePaused=false;
-        public static Random Random = new Random();
-        public static CoOrdinate target = new CoOrdinate();
+        public static Random Random = new();
+        public static CoOrdinate target = new();
         public int Start()
         {
-            ReadGameFile gameFile = new ReadGameFile();
+            ReadGameFile gameFile = new();
             HiScore = gameFile.ReadSettingFile().HighScore;
             gameOver = false;
             Initialize();
