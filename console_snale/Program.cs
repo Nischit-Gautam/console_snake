@@ -9,6 +9,7 @@ public class StartLogic{
     
     public void GameBegin()
     {
+        Console.Title = "ConsoleSnake";
         ReadGameFile readGameFile = new();
         Game game = new();
         var gameInfo = readGameFile.ReadSettingFile();

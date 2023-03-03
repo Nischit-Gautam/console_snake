@@ -5,9 +5,22 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <ApplicationIcon>bjorn-lardner_usgs_brown_treesnake_1_web.ico</ApplicationIcon>
+    <Title>NischitConsoleSnake</Title>
+    <PackageIcon>bjorn-lardner_usgs_brown_treesnake_1_web.ico</PackageIcon>
+    <RepositoryUrl>https://github.com/Nischit-Gautam/console_snale</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="bjorn-lardner_usgs_brown_treesnake_1_web.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="bjorn-lardner_usgs_brown_treesnake_1_web.ico">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Update="gameInfo.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
