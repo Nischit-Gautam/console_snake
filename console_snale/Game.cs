@@ -31,6 +31,8 @@ namespace console_snale
             movementSpeed = 0.2;
             movement = 0;
             initialSnakeLength = 3;
+            xDirection = 1; 
+            yDirection = 0;
             snakeLorry = new();
             Initialize();
             while (!gameOver)
