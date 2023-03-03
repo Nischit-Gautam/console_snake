@@ -1,0 +1,5 @@
+{
+	"HighScore":0,
+	"PreferredName":"",
+	"RefreshRate":50
+}

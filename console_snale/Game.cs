@@ -11,23 +11,66 @@ namespace console_snale
         public static int width = 80;
         public static int height = 20;
         public static SnakeLorry snakeLorry = new SnakeLorry();
-        
+        public static int initialSnakeLength = 3;
         public static int xDirection = 1;//moving left to right-- 0 = not moving in x direction, 1 = left to right, -1= right to left
         public static int yDirection = 0;//moving down to up-- 0 = not moving in y direction, 1 = up to down, -1= down to up  
-        public void Start()
+        public static double movementSpeed = 0.2;
+        public static double movement = 0;
+        public static int score = 0;
+        public static int HiScore = 0;
+        public static bool gameOver=false;
+        public static bool gamePaused=false;
+        public static Random Random = new Random();
+        public static CoOrdinate target = new CoOrdinate();
+        public int Start()
         {
+            ReadGameFile gameFile = new ReadGameFile();
+            HiScore = gameFile.ReadSettingFile().HighScore;
+            gameOver = false;
             Initialize();
-            while (true)
+            while (!gameOver)
             {
                 Console.Clear();
+                CheckTailCollision();
+                CheckCollisionWithTarget();
                 if (Console.KeyAvailable == true)
                 {
                     SnakeDirection(Console.ReadKey(true));
                 }
+                while(gamePaused) { 
+                    Console.Clear();
+                    Console.SetCursorPosition(width/2, height/2);
+                    Console.WriteLine("Paused!!");
+                    Console.SetCursorPosition(width / 2, (height / 2)+2);
+                    Console.WriteLine("Press Enter to Continue.");
+                    if( Console.ReadKey(true).Key == ConsoleKey.Enter)
+                    {
+                        gamePaused= false;
+                    };
+                    Thread.Sleep(100);
+                }
                 MoveSnake();
+                Console.ForegroundColor = System.ConsoleColor.DarkGreen;
                 DrawSnake();
+                
+                Console.ForegroundColor = System.ConsoleColor.Yellow;
+                DrawTarget();
+                Console.ForegroundColor = System.ConsoleColor.Blue;
+                DrawScore();
                 Thread.Sleep(50);
             }
+            Console.Clear();
+            
+            Console.ForegroundColor = System.ConsoleColor.Red;
+            Console.SetCursorPosition(width/2, height/2);
+            Console.WriteLine("Game Over");
+            Console.SetCursorPosition(width / 2, (height / 2)+2);
+            Console.ForegroundColor = System.ConsoleColor.Green;
+            Console.WriteLine("Press R to restart.");
+            Console.ForegroundColor = System.ConsoleColor.Cyan;
+            Console.SetCursorPosition(width / 2, (height / 2)+4);
+            Console.WriteLine("Press Esc to exit!");
+            return score;
         }
         public void Initialize()
         {
@@ -35,11 +78,12 @@ namespace console_snale
             if(snakeLorry.Tail==null) snakeLorry.Tail= new List<CoOrdinate>();
             snakeLorry.Head.XLocation = width / 2;
             snakeLorry.Head.YLocation = height / 2;
-            snakeLorry.Length = 3;
+            snakeLorry.Length = initialSnakeLength;
             for (int i = 1; i < snakeLorry.Length; i++)
             {
                 snakeLorry.Tail.Add(new CoOrdinate() { XLocation = (width / 2) - i, YLocation = height / 2 });
             }
+            GenerateTarget();
         }
         public void SnakeDirection(ConsoleKeyInfo key)
         {
@@ -82,39 +126,51 @@ namespace console_snale
                         }
                     }
                     break;
+                case ConsoleKey.Escape:
+                    {
+                        gamePaused = true;
+                    }
+                    break;
             }
         }
         public void MoveSnake()
         {
-            MoveTails();
-            if (snakeLorry.Head.XLocation == width && xDirection==1)
+            if (movement > 2)
             {
-                snakeLorry.Head.XLocation = 0;
-                snakeLorry.Head.XLocation += xDirection;
+
+                MoveTails();
+                if (snakeLorry.Head.XLocation == width && xDirection == 1)
+                {
+                    snakeLorry.Head.XLocation = 0;
+                    snakeLorry.Head.XLocation += xDirection;
+                }
+                else if (snakeLorry.Head.XLocation == 0 && xDirection == -1)
+                {
+                    snakeLorry.Head.XLocation = width;
+                    snakeLorry.Head.XLocation += xDirection;
+                }
+                else
+                {
+                    snakeLorry.Head.XLocation += xDirection;
+                }
+                if (snakeLorry.Head.YLocation == height && yDirection == 1)
+                {
+                    snakeLorry.Head.YLocation = 0;
+                    snakeLorry.Head.YLocation = yDirection;
+                }
+                else if (snakeLorry.Head.YLocation == 0 && yDirection == -1)
+                {
+                    snakeLorry.Head.YLocation = height;
+                    snakeLorry.Head.YLocation += yDirection;
+                }
+                else
+                {
+                    snakeLorry.Head.YLocation += yDirection;
+                }
+
+                movement = 0;
             }
-            else if(snakeLorry.Head.XLocation==0 && xDirection == -1)
-            {
-                snakeLorry.Head.XLocation = width;
-                snakeLorry.Head.XLocation += xDirection;
-            }
-            else
-            {
-                snakeLorry.Head.XLocation += xDirection;
-            }
-            if(snakeLorry.Head.YLocation == height && yDirection==1)
-            {
-                snakeLorry.Head.YLocation = 0;
-                snakeLorry.Head.YLocation += yDirection;
-            }
-            else if(snakeLorry.Head.YLocation==0 && yDirection == -1)
-            {                
-                snakeLorry.Head.YLocation = height;
-                snakeLorry.Head.YLocation += yDirection;
-            }
-            else
-            {
-                snakeLorry.Head.YLocation += yDirection;
-            }
+            movement += movement + movementSpeed;
         }
         private void MoveTails()
         {
@@ -155,5 +211,56 @@ namespace console_snale
             }
            
         }
+        public void DrawTarget()
+        {
+            Console.SetCursorPosition(target.XLocation, target.YLocation);
+            Console.WriteLine("#");
+        }
+        public void DrawScore()
+        {
+            string scoreRecord = "Current Score: " + score;
+            Console.SetCursorPosition(0, height + 2);
+            Console.WriteLine(scoreRecord);
+            Console.SetCursorPosition(width - (scoreRecord.Length + 4), height + 2);
+            Console.WriteLine("High Score: " + HiScore);
+        }
+        public void CheckTailCollision()
+        {
+            foreach(var tailCordinate  in snakeLorry.Tail)
+            {
+                if(snakeLorry.Head.XLocation==tailCordinate.XLocation && snakeLorry.Head.YLocation==tailCordinate.YLocation)
+                {
+                    gameOver = true; 
+                    break;
+                }
+            }
+        }
+        public void GenerateTarget()
+        {
+            int xLoc = Random.Next(0, width);
+            int yLoc = Random.Next(0, height);
+            target.XLocation = xLoc;
+            target.YLocation = yLoc;            
+        }
+        
+        public void CheckCollisionWithTarget()
+        {
+            if(snakeLorry.Head.XLocation==target.XLocation && snakeLorry.Head.YLocation== target.YLocation)
+            {
+                score += 10;
+                GenerateTarget();
+                snakeLorry.Length += 1;
+                snakeLorry.Tail.Add(new CoOrdinate()
+                {
+                    XLocation = snakeLorry.Tail[snakeLorry.Tail.Count-1].XLocation,
+                    YLocation = snakeLorry.Tail[snakeLorry.Tail.Count-1].YLocation
+                });
+                if (score % 100 == 0)
+                {
+                    movementSpeed += 0.1;
+                }
+            }
+        }
+
     }
 }
